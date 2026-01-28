@@ -12,8 +12,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
-    include: ["tests/**/*.test.ts", "specs/**/*.test.ts"],
-    exclude: ["tests/fixtures/**/*.test.ts", "specs/work/done/**/*.test.ts"],
+    include: ["tests/**/*.test.ts", "spx/**/*.test.ts", "specs/**/*.test.ts"],
     // Use forks instead of threads for integration tests that need process.chdir()
     pool: "forks",
     coverage: {
