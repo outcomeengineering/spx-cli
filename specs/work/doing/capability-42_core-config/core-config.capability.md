@@ -10,8 +10,7 @@
 
 ## Testing Strategy
 
-> Capabilities require **all three levels** to prove end-to-end value delivery.
-> See [testing standards](/docs/development/testing/standards.md) for level definitions.
+> Use `/testing-typescript` skill to understand testing strategy.
 
 ### Level Assignment
 

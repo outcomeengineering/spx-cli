@@ -74,8 +74,7 @@ THEN read from custom settings file for merging
 
 ## Testing Strategy
 
-> Stories require **Level 1** to prove core logic works, but CLI integration requires **Level 2**.
-> See [testing standards](/docs/development/testing/standards.md) for level definitions.
+> Use `/testing-typescript` skill to understand testing strategy.
 
 ### Level Assignment
 

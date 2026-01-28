@@ -41,8 +41,7 @@ AND exclude files like README.md, package.json, etc.
 
 ## Testing Strategy
 
-> Stories require **Level 1** to prove core logic works.
-> See [testing standards](/docs/testing/standards.md) for level definitions.
+> Use `/testing-typescript` skill to understand testing strategy.
 
 ### Level Assignment
 

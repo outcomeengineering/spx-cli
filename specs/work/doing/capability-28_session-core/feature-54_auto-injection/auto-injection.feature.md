@@ -6,8 +6,7 @@ When users run `spx session pickup`, files listed in the session's YAML front ma
 
 ## Testing Strategy
 
-> Features require **Level 1 + Level 2** to prove the feature works with real tools.
-> See [testing standards](/docs/development/testing/standards.md) for level definitions.
+> Use `/testing-typescript` skill to understand testing strategy.
 
 ### Level Assignment
 

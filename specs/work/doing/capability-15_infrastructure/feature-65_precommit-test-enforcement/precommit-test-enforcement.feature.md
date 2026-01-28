@@ -18,8 +18,7 @@ Every commit is automatically validated by running affected tests before the com
 
 ## Testing Strategy
 
-> Features require **Level 1 + Level 2** to prove the feature works with real tools.
-> See [testing standards](/docs/testing/standards.md) for level definitions.
+> Use `/testing-typescript` skill to understn
 
 ### Level Assignment
 

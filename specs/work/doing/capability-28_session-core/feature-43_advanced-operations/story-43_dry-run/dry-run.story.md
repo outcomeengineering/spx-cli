@@ -40,8 +40,7 @@ THEN returns same 5 sessions that pruneSessions({ keep: 5 }) would delete
 
 ## Testing Strategy
 
-> Stories require **Level 1** to prove core logic works.
-> See [testing standards](/docs/development/testing/standards.md) for level definitions.
+> Use `/testing-typescript` skill to understand testing strategy.
 
 ### Level Assignment
 

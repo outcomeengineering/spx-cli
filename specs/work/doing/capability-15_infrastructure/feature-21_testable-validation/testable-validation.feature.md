@@ -20,8 +20,7 @@ Validation is a first-class CLI domain (`spx validation`) that works as a global
 
 ## Testing Strategy
 
-> Features require **Level 1 + Level 2** to prove the feature works with real tools.
-> See `docs/testing/standards.md` for level definitions.
+> Use `/testing-typescript` skill to understand testing strategy.
 
 ### Level Assignment
 

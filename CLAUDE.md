@@ -16,16 +16,6 @@ node spx spec next
 
 Full rules: [`specs/CLAUDE.md`](specs/CLAUDE.md) · Templates: [`specs/templates/`](specs/templates/)
 
-### Human-Readable Documentation
-
-Standards documentation lives in `docs/` for human reference. Agent-specific instructions are in skills.
-
-| Document                    | Contains                    |
-| --------------------------- | --------------------------- |
-| `docs/code/typescript.md`   | TypeScript coding standards |
-| `docs/code/commits.md`      | Commit message format       |
-| `docs/testing/standards.md` | Testing with Vitest         |
-
 ---
 
 ## 🚨 VALIDATION GATE (MANDATORY BEFORE COMMIT)

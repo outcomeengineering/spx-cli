@@ -112,8 +112,7 @@ THEN delete session file
 
 ## Testing Strategy
 
-> Stories require **Level 2** for CLI integration testing.
-> See [testing standards](/docs/testing/standards.md) for level definitions.
+> Use `/testing-typescript` skill to understand testing strategy.
 
 ### Level Assignment
 
