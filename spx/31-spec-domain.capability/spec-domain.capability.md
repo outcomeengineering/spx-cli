@@ -7,8 +7,8 @@ Provides CLI commands for managing the `spx/` specification tree following the C
 ## Success Metric
 
 - **Baseline**: Manual directory creation, DONE.md boolean tracking, no staleness detection
-- **Target**: CLI-managed specs with pass.csv ledger, blob-based staleness, deterministic status
-- **Measurement**: All spec operations complete in <100ms; `spx spec test --stamp` validates pass.csv integrity
+- **Target**: CLI-managed specs with outcomes.yaml ledger, blob-based staleness, deterministic status
+- **Measurement**: All spec operations complete in <100ms; `spx spx commit` validates outcomes.yaml integrity
 
 ## Requirements
 
@@ -23,30 +23,34 @@ The spec domain implements the CODE framework for specification management:
 
 ### Status Determination
 
-Status is derived from `pass.csv` ledger state, not boolean flags:
+Status is derived from `outcomes.yaml` ledger state, not boolean flags:
 
-| Condition                             | State     | Required Action               |
-| ------------------------------------- | --------- | ----------------------------- |
-| Test Files links don't resolve        | Unknown   | Write tests                   |
-| Tests exist, not all passing          | Pending   | Fix code or fix tests         |
-| Spec or test blob changed since stamp | Stale     | Re-stamp with `spx spec test` |
-| All tests pass, blobs unchanged       | Passing   | None—potential realized       |
-| Was passing, now fails, blobs same    | Regressed | Investigate and fix           |
+| Condition                              | State     | Required Action                 |
+| -------------------------------------- | --------- | ------------------------------- |
+| Test Files links don't resolve         | Unknown   | Write tests                     |
+| Tests exist, not all passing           | Pending   | Fix code or fix tests           |
+| Spec or test blob changed since commit | Stale     | Re-commit with `spx spx commit` |
+| All tests pass, blobs unchanged        | Passing   | None—potential realized         |
+| Was passing, now fails, blobs same     | Regressed | Investigate and fix             |
 
-### pass.csv Ledger
+### outcomes.yaml Ledger
 
 Machine-verifiable proof linking specs to test evidence:
 
-```csv
-# spec_blob,a3f2b7c...
-# run,2026-01-28T14:15:00Z
-test_file,test_blob,pass_time
-parsing.unit.test.ts,1f2e...,2026-01-27T10:30:00Z
+```yaml
+spec_blob: a3f2b7c...
+committed_at: 2026-01-28T14:15:00Z
+tests:
+  - file: parsing.unit.test.ts
+    blob: 1f2e...
+    passed_at: 2026-01-27T10:30:00Z
 ```
 
-- `spec_blob`: Git blob SHA of spec file when ledger was stamped
-- `test_blob`: Git blob SHA of test file when it last passed
+- `spec_blob`: Git blob SHA of spec file when ledger was committed
+- `blob`: Git blob SHA of test file when it last passed
+- `passed_at`: ISO 8601 timestamp when test passed
 - Staleness detected by blob comparison, not timestamps
+- `tests/` prefix is never stored—paths derived as `<container>/tests/<file>`
 
 ### BSP Numbering
 
@@ -62,27 +66,27 @@ Two-digit (10-99) encoding dependency order:
 
 Precommit is primary feedback loop:
 
-1. **Phantom check**: Every test_file in pass.csv must exist
+1. **Phantom check**: Every test file in outcomes.yaml must exist
 2. **Regression check**: Listed tests must pass; unchanged blob + failure = regression
-3. **Staleness check**: spec_blob mismatch = re-stamp required
-4. **Progress tests**: Tests not in pass.csv are in-progress (not an error)
+3. **Staleness check**: spec_blob mismatch = re-commit required
+4. **Progress tests**: Tests not in outcomes.yaml are in-progress (not an error)
 
 ## Test Strategy
 
-| Component          | Level | Harness     | Rationale                          |
-| ------------------ | ----- | ----------- | ---------------------------------- |
-| BSP calculation    | 1     | -           | Pure arithmetic, no I/O            |
-| Directory parsing  | 1     | -           | Pure string parsing                |
-| pass.csv parsing   | 1     | -           | Pure CSV/blob parsing              |
-| Status derivation  | 1     | -           | Pure logic from parsed state       |
-| Spec creation      | 2     | cli-harness | Needs real filesystem + git        |
-| Validation         | 2     | cli-harness | Needs real spx binary + test files |
-| Full spec workflow | 3     | e2e-harness | Needs real project with git repo   |
+| Component             | Level | Harness     | Rationale                          |
+| --------------------- | ----- | ----------- | ---------------------------------- |
+| BSP calculation       | 1     | -           | Pure arithmetic, no I/O            |
+| Directory parsing     | 1     | -           | Pure string parsing                |
+| outcomes.yaml parsing | 1     | -           | Pure YAML/blob parsing             |
+| Status derivation     | 1     | -           | Pure logic from parsed state       |
+| Spec creation         | 2     | cli-harness | Needs real filesystem + git        |
+| Validation            | 2     | cli-harness | Needs real spx binary + test files |
+| Full spec workflow    | 3     | e2e-harness | Needs real project with git repo   |
 
 ### Escalation Rationale
 
 - **1 → 2**: Level 1 tests pure logic; Level 2 confirms filesystem operations work correctly with real directories and git blob computation
-- **2 → 3**: Level 2 tests individual commands; Level 3 confirms full agent workflow (create → implement → stamp → validate) works end-to-end
+- **2 → 3**: Level 2 tests individual commands; Level 3 confirms full agent workflow (create → implement → commit → validate) works end-to-end
 
 ## Outcomes
 
@@ -121,9 +125,9 @@ AND response time is <100ms
 ### 3. Validation detects regression
 
 ```gherkin
-GIVEN a pass.csv with test entry (unchanged spec_blob, unchanged test_blob)
+GIVEN an outcomes.yaml with test entry (unchanged spec_blob, unchanged blob)
 WHEN that test fails
-THEN `spx spec test` reports regression
+THEN `spx spx test` reports regression
 AND exit code is non-zero
 AND output identifies the regressed test
 ```
@@ -137,10 +141,10 @@ AND output identifies the regressed test
 ### 4. Validation detects staleness
 
 ```gherkin
-GIVEN a pass.csv with spec_blob from previous commit
+GIVEN an outcomes.yaml with spec_blob from previous commit
 WHEN spec file is modified (different blob)
-THEN `spx spec test` reports stale
-AND suggests re-stamp with `spx spec test --stamp`
+THEN `spx spx test` reports stale
+AND suggests re-commit with `spx spx commit`
 ```
 
 | File                                         | Level | Harness                                               |
@@ -149,14 +153,14 @@ AND suggests re-stamp with `spx spec test --stamp`
 
 ---
 
-### 5. Stamp records passing tests
+### 5. Commit records passing tests
 
 ```gherkin
 GIVEN a container with tests/ directory containing passing tests
-WHEN agent runs `spx spec test --stamp <container>`
-THEN pass.csv is created/updated
+WHEN agent runs `spx spx commit <container>`
+THEN outcomes.yaml is created/updated
 AND spec_blob matches current spec file
-AND each passing test has test_blob and pass_time recorded
+AND each passing test has blob and passed_at recorded
 ```
 
 | File                                 | Level | Harness                                               |
@@ -167,8 +171,8 @@ AND each passing test has test_blob and pass_time recorded
 
 ## Architectural Constraints
 
-| ADR       | Constraint                                                 |
-| --------- | ---------------------------------------------------------- |
-| (pending) | Blob-based staleness detection over timestamp comparison   |
-| (pending) | pass.csv as sole source of truth for verification state    |
-| (pending) | BSP numbering with hyphen separator (`21-foo.capability/`) |
+| ADR       | Constraint                                                   |
+| --------- | ------------------------------------------------------------ |
+| (pending) | Blob-based staleness detection over timestamp comparison     |
+| (pending) | outcomes.yaml as sole source of truth for verification state |
+| (pending) | BSP numbering with hyphen separator (`21-foo.capability/`)   |

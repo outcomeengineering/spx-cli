@@ -4,17 +4,48 @@
 
 **Single Entry Point**: This document provides project overview and validation requirements.
 
+---
+
+## 🚨 MIGRATION IN PROGRESS: specs/ → spx/
+
+**We are migrating from the legacy `specs/` framework to the CODE Framework in `spx/`.**
+
+| Directory | System         | Status                                                  |
+| --------- | -------------- | ------------------------------------------------------- |
+| `spx/`    | CODE Framework | **Primary** - use for all new work                      |
+| `specs/`  | Legacy         | **Frozen** - do not modify unless explicitly instructed |
+
+**Key differences:**
+
+| Aspect          | Legacy (`specs/`)                | CODE Framework (`spx/`)       |
+| --------------- | -------------------------------- | ----------------------------- |
+| Test location   | Graduate to global `tests/`      | Stay in container `tests/`    |
+| Status tracking | `DONE.md` in container           | `outcomes.yaml` ledger        |
+| Philosophy      | Task-driven (backlog/doing/done) | Outcome-driven, durable specs |
+
+**Migration tracking:** Each migrated container has an `SPX-MIGRATION.md` file documenting reverse-graduation of tests.
+
+**Primary guide for new work:** [`spx/CLAUDE.md`](spx/CLAUDE.md)
+
+---
+
 ### Finding Work
 
-**Rule**: Lower BSP number = higher priority. Complete `feature-48` before `feature-87`, regardless of status.
+**Rule**: Lower BSP number = higher priority. Complete `21-*.feature` before `32-*.feature`.
+
+> **Note:** The `spx spec` and `spx spx` domain commands are not yet implemented. Use skills or manual inspection to find work items.
 
 ```bash
-# Get status and next item
-node spx spec status
-node spx spec next
+# These commands do NOT work yet:
+# spx spec status
+# spx spec next
+
+# Instead, use skills:
+/spx:understanding-spx   # Load context for a work item
+/spx:managing-spx        # Find next work item, create specs
 ```
 
-Full rules: [`specs/CLAUDE.md`](specs/CLAUDE.md) · Templates: [`specs/templates/`](specs/templates/)
+Full CODE Framework rules: [`spx/CLAUDE.md`](spx/CLAUDE.md)
 
 ---
 
@@ -40,11 +71,11 @@ Before committing ANY changes:
 
 ### Committing Changes
 
-**ALWAYS use the `claude:committing-changes` skill to commit.** Never run raw git commands for commits.
+**ALWAYS use the `core:commit` skill to commit.** Never run raw git commands for commits.
 
 ```bash
 # Correct: invoke the skill
-/claude:committing-changes
+/core:commit
 
 # Wrong: manual git commands
 git add . && git commit -m "..."
@@ -77,23 +108,21 @@ All validation runs through `spx validation` subcommands. Use pnpm scripts or ca
 
 ## Finding Work Items
 
-**Use the `spx` CLI to check project status:**
+> **Note:** The `spx spec` and `spx spx` domain commands are not yet implemented.
+
+**For now, use skills to find and understand work:**
 
 ```bash
-# Get current project status (fast, deterministic)
-node spx spec status
-
-# Find next work item
-node spx spec next
+/spx:managing-spx        # Ask "what's next?" - finds next work item by BSP order
+/spx:understanding-spx   # Load full context for a specific work item
 ```
 
-**Why use spx:**
+**Or inspect the `spx/` directory manually:**
 
-- Fast: <100ms vs minutes with manual searching
-- Deterministic: Reliable DONE/IN PROGRESS/OPEN classification
-- Accurate: Uses tests/DONE.md for status determination
+- Lower BSP number = higher priority
+- Check `outcomes.yaml` for status (missing = unknown, has entries = check if tests pass)
 
-**For work item details**: Read [`specs/CLAUDE.md`](specs/CLAUDE.md)
+**For CODE Framework details**: Read [`spx/CLAUDE.md`](spx/CLAUDE.md)
 
 ---
 
@@ -219,8 +248,20 @@ src/
 
 ### Status Determination
 
-Status is computed from the `tests/` directory state:
+**CODE Framework (`spx/`)** - status via `outcomes.yaml` ledger:
 
-- **OPEN**: Missing or empty `tests/` directory
-- **IN PROGRESS**: `tests/` has files but no `DONE.md`
-- **DONE**: `tests/DONE.md` exists
+| State     | Condition                          | Required Action                 |
+| --------- | ---------------------------------- | ------------------------------- |
+| Unknown   | Test Files links don't resolve     | Write tests                     |
+| Pending   | Tests exist, not all passing       | Fix code or fix tests           |
+| Stale     | Spec or test blob changed          | Re-commit with `spx spx commit` |
+| Passing   | All tests pass, blobs unchanged    | None—potential realized         |
+| Regressed | Was passing, now fails, blobs same | Investigate and fix             |
+
+**Legacy (`specs/`)** - status via `tests/` directory:
+
+| State       | Condition                           |
+| ----------- | ----------------------------------- |
+| OPEN        | Missing or empty `tests/` directory |
+| IN PROGRESS | `tests/` has files but no `DONE.md` |
+| DONE        | `tests/DONE.md` exists              |
