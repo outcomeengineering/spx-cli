@@ -29,6 +29,13 @@
 
 ---
 
+## BSP Numbers
+
+- BSP stands for Binary Space Partitioning.
+- BSP numbers are only sibling-unique. Always use the complete path `capability-NN/feature-NN/story-NN` and `capability-NN/feature-NN/adr-NN` etc. when interacting with the user, creating handoff documents or otherwise referring to artifcats within the `specs/` and `spx/` directories.
+
+---
+
 ### Finding Work
 
 **Rule**: Lower BSP number = higher priority. Complete `21-*.feature` before `32-*.feature`.
@@ -85,17 +92,15 @@ git add . && git commit -m "..."
 
 All validation runs through `spx validation` subcommands. Use pnpm scripts or call spx directly:
 
-| pnpm Script                    | spx Command                             | Purpose                       |
-| ------------------------------ | --------------------------------------- | ----------------------------- |
-| `pnpm run validate`            | `spx validation all`                    | Full validation pipeline      |
-| `pnpm run validate:production` | `spx validation all --scope production` | Production scope only         |
-| `pnpm run lint`                | `spx validation lint`                   | ESLint only                   |
-| `pnpm run lint:fix`            | `spx validation lint --fix`             | Auto-fix ESLint issues        |
-| `pnpm run typecheck`           | `spx validation typescript`             | TypeScript only               |
-| `pnpm run circular`            | `spx validation circular`               | Check circular dependencies   |
-| `pnpm run knip`                | `spx validation knip`                   | Find unused code              |
-| `pnpm run format`              | —                                       | Format code with Prettier     |
-| `pnpm run format:check`        | —                                       | Check formatting (no changes) |
+| pnpm Script                    | spx Command                             | Purpose                     |
+| ------------------------------ | --------------------------------------- | --------------------------- |
+| `pnpm run validate`            | `spx validation all`                    | Full validation pipeline    |
+| `pnpm run validate:production` | `spx validation all --scope production` | Production scope only       |
+| `pnpm run lint`                | `spx validation lint`                   | ESLint only                 |
+| `pnpm run lint:fix`            | `spx validation lint --fix`             | Auto-fix ESLint issues      |
+| `pnpm run typecheck`           | `spx validation typescript`             | TypeScript only             |
+| `pnpm run circular`            | `spx validation circular`               | Check circular dependencies |
+| `pnpm run knip`                | `spx validation knip`                   | Find unused code            |
 
 **Options available on all spx validation subcommands:**
 
@@ -113,7 +118,7 @@ All validation runs through `spx validation` subcommands. Use pnpm scripts or ca
 **For now, use skills to find and understand work:**
 
 ```bash
-/spx:managing-spx        # Ask "what's next?" - finds next work item by BSP order
+/spx:managing-spx        # Ask "what's next?" - finds next work item by hierarchy (capability -> feature -> story) and then by BSP order
 /spx:understanding-spx   # Load full context for a specific work item
 ```
 

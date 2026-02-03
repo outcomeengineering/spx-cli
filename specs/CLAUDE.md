@@ -1,250 +1,202 @@
-# specs/ Directory Guide
+# specs/ Directory Guide (LEGACY)
 
-This guide covers navigating, reading status, and editing work items in the `specs/` directory.
+> **⚠️ LEGACY SYSTEM**: The `specs/` directory structure is legacy. New projects use the CODE framework with `spx/` directory. This guide applies ONLY to projects that still use `specs/`.
+
+## 🚨 DISAMBIGUATION: specs/ vs spx/
+
+**Before proceeding, determine which system this project uses:**
+
+| Directory | System         | Skills to Use                                       |
+| --------- | -------------- | --------------------------------------------------- |
+| `specs/`  | Legacy         | `specs:understanding-specs`, `specs:managing-specs` |
+| `spx/`    | CODE framework | `spx:understanding-spx`, `spx:managing-spx`         |
+
+**If BOTH directories exist**: Ask the user which system they want to work with.
+
+**If NEITHER exists**: Ask the user if they want to set up specs (legacy) or spx (CODE framework).
+
+**Fully qualified skill names** (required when both plugins are installed):
+
+```bash
+# Legacy specs/ projects
+/specs:understanding-specs
+/specs:managing-specs
+
+# CODE framework spx/ projects
+/spx:understanding-spx
+/spx:managing-spx
+```
 
 ---
 
-## Navigating the `specs/` Directory
+This guide explains WHEN to invoke specs skills. It is a **router** that tells you which skill to use. The skills themselves contain the HOW (detailed procedures, templates, structure definitions).
 
-### **IMPORTANT:** Always invoke the `/understanding-specs` skill on the file within the `specs/` directory you will work on
+---
 
-> Summary of the structure of the `specs/` directory.
+## 🚨 MANDATORY SKILL INVOCATION RULES
 
-<structure_definition>
+**YOU MUST STOP AND INVOKE THE APPROPRIATE SKILL BEFORE PROCEEDING.**
 
-## SPX Framework Structure
+Do NOT grep for templates.
+Do NOT search for structure definitions.
+Do NOT copy patterns you find in the repository.
+Do NOT guess at requirements patterns.
 
-The specs/ directory follows the SPX framework structure defined in `structure.yaml`.
+DO use the skills as described below.
 
-### Three-Phase Transformation
+**The skills are the only authoritative source.**
 
-1. **Requirements (PRD/TRD)** - Capture vision without implementation constraints
-2. **Decisions (ADR)** - Constrain architecture with explicit trade-offs
-3. **Work Items (Capability/Feature/Story)** - Sized, testable implementation containers
+---
 
-### Directory Structure
+## 🚨 CRITICAL: BSP Numbers Are SIBLING-UNIQUE, Not Global
 
-```
-specs/
-├── [product-name].prd.md          # Product-wide PRD 
-├── decisions/                      # Product-wide ADRs (optional)
-│   └── adr-NNN_{slug}.md
-└── work/
-    ├── backlog/
-    ├── doing/
-    │   └── capability-NN_{slug}/
-    │       ├── {slug}.capability.md
-    │       ├── {slug}.prd.md        # Optional: Capability-scoped PRD from which the capability spec in (`{slug}.capability.md`) is derived
-    │       ├── {slug}.prd.md        # Optional: Capability-scoped TRD from which capability-scoped ADRs are derived
-    │       ├── decisions/           # Optional: Capability-scoped ADRs
-    │       ├── tests/
-    │       └── feature-NN_{slug}/
-    │           ├── {slug}.prd.md    # Optional: Feature-scoped PRD from which the feature spec in `{slug}.feature.md` is derived
-    │           ├── {slug}.trd.md    # Optional: Feature-scoped TRD from which the feature-scoped ADRs are derived
-    │           ├── {slug}.feature.md
-    │           ├── decisions/       # Optional: Feature-scoped ADRs
-    │           ├── tests/
-    │           └── story-NN_{slug}/
-    │               ├── {slug}.story.md
-    │               └── tests/
-    └── done/
+**BSP numbers (capability-NN, feature-NN, story-NN) are ONLY unique among siblings at the same level.**
+
+```text
+capability-21/feature-32/story-54  ← One story-54
+capability-28/feature-32/story-54  ← DIFFERENT story-54
+capability-21/feature-87/story-54  ← DIFFERENT story-54
 ```
 
-### Work Item Hierarchy
+**ALWAYS use the FULL PATH when referencing work items:**
 
-- **Capability**: E2E scenario with product-wide impact
-  - Tests graduate to `tests/e2e/`
-  - Triggered by PRD
-  - Contains features
+| ❌ WRONG (Ambiguous)     | ✅ CORRECT (Unambiguous)                     |
+| ------------------------ | -------------------------------------------- |
+| "story-54"               | "capability-21/feature-54/story-54"          |
+| "implement feature-32"   | "implement capability-21/feature-32"         |
+| "Continue with story-54" | "Continue capability-21/feature-54/story-54" |
 
-- **Feature**: Integration scenario with specific functionality
-  - Tests graduate to `tests/integration/`
-  - Triggered by TRD
-  - Contains stories
+**Why this matters:**
 
-- **Story**: Unit-tested atomic implementation
-  - Tests graduate to `tests/unit/`
-  - No children
-  - Atomic implementation unit
+- Different capabilities can have identically-numbered features
+- Different features can have identically-numbered stories
+- "story-54" could refer to dozens of different stories across the codebase
+- Without the full path, agents will access the WRONG work item
 
-### Key Principles
+**When communicating about work items:**
 
-- **PRD OR TRD** at same scope, never both
-- **Requirements immutable** - code adapts to requirements, not vice versa
-- **BSP numbering**: Two-digit (10-99), lower number = must complete first
-- **Test graduation**: `specs/.../tests/` → `tests/{unit,integration,e2e}/`
-- **Status rules**:
-  - OPEN: No tests exist
-  - IN_PROGRESS: Tests exist, no DONE.md
-  - DONE: DONE.md exists
+1. Always include the full hierarchy path
+2. Never use bare numbers like "story-54" without context
+3. When in doubt, use the absolute path from `specs/work/`
 
-</structure_definition>
+---
 
-## READ: Status and What to Work On Next
+## When to Invoke Skills
 
-<understanding_work_items>
+### Before Implementing ANY Work Item → `/specs:understanding-specs`
 
-### Three States
+**⛔ BLOCKING REQUIREMENT: DO NOT PROCEED WITHOUT INVOKING THIS SKILL**
 
-Status is determined by the `tests/` directory at each level:
+**Trigger conditions** (any of these):
 
-| State           | `tests/` Directory           | Meaning          |
-| --------------- | ---------------------------- | ---------------- |
-| **OPEN**        | Missing OR empty             | Work not started |
-| **IN_PROGRESS** | Has `*.test.*`, no `DONE.md` | Work underway    |
-| **DONE**        | Has `DONE.md`                | Complete         |
+- User says "implement story-NN", "work on feature-NN", or "build capability-NN"
+- User references a work item file (e.g., "implement this.story.md")
+- User asks you to write code for a story/feature/capability
+- You see a work item path in `specs/work/doing/`
+- You're about to write implementation code in a feature/story/capability scope
 
-### 🚨 BSP Numbers = Dependency Order
+**What it does**: Loads complete context hierarchy (PRD/TRD → ADRs → work item → tests). Verifies all specification documents exist before implementation.
 
-> **Lower BSP number = must complete FIRST.**
->
-> You CANNOT work on item N until ALL items with numbers < N are DONE.
+**Why mandatory**: Without this skill, you will miss requirements, violate ADRs, and implement the wrong thing.
 
-This applies at every level:
+**Example**:
 
-| If you see...                                   | It means...                                      |
-| ----------------------------------------------- | ------------------------------------------------ |
-| `feature-48` before `feature-87`                | feature-48 MUST be DONE before feature-87 starts |
-| `story-21` before `story-32`                    | story-21 MUST be DONE before story-32 starts     |
-| `feature-48 [OPEN]`, `feature-87 [IN_PROGRESS]` | **BUG**: Dependency violation                    |
-
-### Finding the Next Work Item
-
+```text
+User: "Implement story-21_parse-flags"
+→ STOP. DO NOT proceed to reading files or writing code.
+→ IMMEDIATELY invoke: /understanding-specs specs/work/doing/.../story-21_parse-flags/parse-flags.story.md
+→ WAIT for skill to load complete context
+→ THEN proceed with implementation
 ```
-1. List all work items in BSP order (capability → feature → story)
-2. Return the FIRST item where status ≠ DONE
-3. That item blocks everything after it
+
+---
+
+### When Creating/Organizing Spec Structure → `/specs:managing-specs`
+
+**⛔ BLOCKING REQUIREMENT: DO NOT PROCEED WITHOUT INVOKING THIS SKILL**
+
+**Trigger conditions** (any of these):
+
+- User says "create a PRD", "write a TRD", "add an ADR"
+- User says "set up specs directory", "organize specs"
+- User asks "what's the next work item to implement?"
+- You need to understand BSP numbering or work item hierarchy
+- You need ANY template (PRD/TRD/ADR/capability/feature/story)
+- User asks about work item status (OPEN/IN_PROGRESS/DONE)
+
+**What it does**: Provides access to all templates in the skill's `templates/` directory. Contains SPX framework structure, BSP numbering rules, status determination rules.
+
+**Why mandatory**: Templates live in the skill directory (`.claude/plugins/cache/.../managing-specs/templates/`), NOT in the project. Searching the project will fail. The skill contains the complete structure definition.
+
+**Example**:
+
+```text
+User: "Create a PRD for the new authentication feature"
+→ STOP. DO NOT search for template files in the project.
+→ DO NOT grep for "*.prd.md" files.
+→ IMMEDIATELY invoke: /managing-specs
+→ READ template from: ${SKILL_DIR}/templates/requirements/product-change.prd.md
+→ ADAPT template with authentication feature content
 ```
 
 **Example**:
 
 ```text
-feature-48_test-harness [OPEN]        ← Was added after feature-87 but blocks it
-feature-87_e2e-workflow [IN_PROGRESS] ← Was already started, then dependency discovered
+User: "What should I work on next?"
+→ STOP. DO NOT search for work items yourself.
+→ IMMEDIATELY invoke: /managing-specs
+→ ASK skill: "What's the next work item based on BSP ordering?"
+→ Skill will identify first OPEN or IN_PROGRESS item
 ```
-
-**Next work item**: `feature-48_test-harness` → its first OPEN story.
-
-</understanding_work_items>
 
 ---
 
-## EDIT: Adding or Reordering Work Items
+## Quick Reference: Skill Selection Decision Tree
 
-<managing_work_items>
-
-<numbering_work_items>
-
-### BSP Numbering
-
-Two-digit prefixes in range **[10, 99]** encode dependency order.
-
-### Creating New Items
-
-#### Case 1: First Item (No Siblings)
-
-Use position **21** (leaves room for ~10 items before/after):
-
-```
-# First feature in a new capability
-capability-21_foo/
-└── feature-21_first-feature/
-```
-
-#### Case 2: Insert Between Siblings
-
-Use midpoint: `new = floor((left + right) / 2)`
-
-```
-# Insert between feature-21 and feature-54
-new = floor((21 + 54) / 2) = 37
-
-feature-21_first/
-feature-37_inserted/    ← NEW
-feature-54_second/
-```
-
-#### Case 3: Append After Last
-
-Use midpoint to upper bound: `new = floor((last + 99) / 2)`
-
-```
-# Append after feature-54
-new = floor((54 + 99) / 2) = 76
-
-feature-21_first/
-feature-54_second/
-feature-76_appended/    ← NEW
-```
-
-</numbering_work_items>
-
-<creating_work_items>
-Every work item needs:
-
-1. **Directory**: `NN_{slug}/`
-2. **Definition file**: `{slug}.{capability|feature|story}.md`
-3. **Tests directory**: `tests/` (create when starting work)
-
-Optional:
-
-- **Requirements document**: `{topic}.prd.md` or `{topic}.trd.md`
-- **Decision Records**: `decisions/adr-NNN_{slug}.md`
-
-</creating_work_items>
-
-</managing_work_items>
-
-**Templates**: Use `/managing-specs` skill to access templates.
-
-### Marking Complete
-
-1. Ensure all tests pass
-2. Create `tests/DONE.md` with:
-   - Summary of what was implemented
-   - List of graduated tests (moved to production `tests/`)
-   - Any notes for future reference
-
-### Test Graduation
-
-When a work item is DONE, its tests graduate from `specs/.../tests/` to the production test suite:
-
-| From                                     | To                   |
-| ---------------------------------------- | -------------------- |
-| `specs/.../story-NN/tests/*.test.*`      | `tests/unit/`        |
-| `specs/.../feature-NN/tests/*.test.*`    | `tests/integration/` |
-| `specs/.../capability-NN/tests/*.test.*` | `tests/e2e/`         |
-
-> ⚠️ **Never write tests directly in `tests/`** — this breaks CI until implementation is complete. Always write in `specs/.../tests/` first, then graduate.
+| User Says...                           | YOU MUST INVOKE                              | DO NOT                                       |
+| -------------------------------------- | -------------------------------------------- | -------------------------------------------- |
+| "Implement story-21"                   | `/specs:understanding-specs` (on story file) | Do NOT read story.md directly                |
+| "Work on this feature"                 | `/specs:understanding-specs` (on feature)    | Do NOT start coding without context          |
+| "Create a PRD"                         | `/specs:managing-specs`                      | Do NOT search project for PRD templates      |
+| "Write an ADR"                         | `/specs:managing-specs`                      | Do NOT search project for ADR templates      |
+| "What's next to work on?"              | `/specs:managing-specs`                      | Do NOT grep for work items yourself          |
+| "Set up specs structure"               | `/specs:managing-specs`                      | Do NOT create directories without guidance   |
+| "What's the status of feature-21?"     | `/specs:managing-specs`                      | Do NOT inspect `tests/` directories yourself |
+| "Add a new capability/feature/story"   | `/specs:managing-specs`                      | Do NOT calculate BSP numbers yourself        |
+| "Show me the PRD for this capability"  | `/specs:understanding-specs` (on capability) | Do NOT read PRD without loading full context |
+| "How do I organize requirements docs?" | `/specs:managing-specs`                      | Do NOT invent your own structure             |
 
 ---
 
-## Creating Requirements
+## Status and Work Item Rules Summary
 
-**For product requirements:**
+**⚠️ For complete details, invoke `/specs:managing-specs` skill. Do NOT rely on this summary alone.**
 
-- Invoke `/writing-prd` skill
-- Creates PRDs with user value and measurable outcomes
-- Catalyzes capability decomposition
+### Key Principles
 
-**For technical requirements:**
+**BSP Numbering**: Lower number = must complete FIRST. You CANNOT work on item N until ALL items with numbers < N are DONE.
 
-- Invoke `/writing-trd` skill
-- Creates TRDs with architecture and validation strategy
-- Catalyzes feature decomposition
+**Status Determination** (use CLI commands, do NOT check manually):
 
-**For structure and templates:**
+```bash
+# View project status
+spx spec status --format table
 
-- Invoke `/managing-specs` skill
-- Provides templates for PRD/TRD/ADR/work items
-- Defines directory structure and conventions
+# Get next work item (respects BSP ordering)
+spx spec next
+```
 
-**Before implementing any work item:**
+Status values: OPEN, IN_PROGRESS, DONE
 
-- Invoke `/understanding-specs` skill
-- Reads complete context hierarchy (capability → feature → story)
-- Verifies all specification documents exist
-- Fails fast if context is incomplete
+**Finding Next Work Item**: Run `spx spec next` or invoke `/specs:managing-specs`. Do NOT manually check for `DONE.md` files or inspect `tests/` directories yourself.
+
+**Test Graduation**:
+
+- Story tests: `specs/.../tests/` → `tests/unit/`
+- Feature tests: `specs/.../tests/` → `tests/integration/`
+- Capability tests: `specs/.../tests/` → `tests/e2e/`
+
+**Critical Rule**: Never write tests directly in `tests/` — this breaks CI until implementation is complete. Always write in `specs/.../tests/` first, then graduate upon completion.
 
 ---
 
@@ -252,15 +204,69 @@ When a work item is DONE, its tests graduate from `specs/.../tests/` to the prod
 
 Claude Code session handoffs are stored in:
 
-```
+```text
 .spx/sessions/
 ├── TODO_*.md      # Available for /pickup
 └── DOING_*.md     # Currently claimed
 ```
 
-Use `/handoff` to create session context for continuation.
-Use `/pickup` to load and claim a handoff.
+**Commands**:
+
+- Use `/handoff` to create session context for continuation
+- Use `/pickup` to load and claim a handoff
 
 ---
 
-**For complete workflow methodology**, reference the SPX framework documentation (when available) or consult the `/managing-specs` skill for structure details.
+## Why These Rules Are Non-Negotiable
+
+### Problem: Template Hallucination
+
+Without invoking `/specs:managing-specs`, agents:
+
+- Search the project for templates that don't exist there
+- Find OLD PRDs/TRDs and copy their (possibly wrong) structure
+- Invent their own template structure
+- Miss critical sections required by the SPX framework
+
+**Result**: Requirements documents that are incomplete or violate the framework.
+
+### Problem: Context Gaps
+
+Without invoking `/specs:understanding-specs`, agents:
+
+- Miss parent PRD/TRD context
+- Violate ADR decisions unknowingly
+- Implement the wrong requirements
+- Skip test requirements
+
+**Result**: Code that doesn't match requirements and fails review.
+
+### Problem: Structure Violations
+
+Without invoking `/specs:managing-specs` for BSP numbering:
+
+- Create work items with wrong numbers
+- Violate dependency ordering
+- Break the BSP algorithm (items can collide or be out of order)
+
+**Result**: Work items that can't be ordered correctly, blocking downstream work.
+
+---
+
+## Verification Checklist
+
+Before proceeding with ANY specs-related task:
+
+- [ ] Did I invoke the correct skill?
+- [ ] Did I wait for skill output before proceeding?
+- [ ] Did I read templates from `${SKILL_DIR}/templates/`, NOT from the project?
+- [ ] Did I load complete context hierarchy for work items?
+- [ ] Did I verify BSP numbering through the skill, not by calculating myself?
+
+**If any checkbox is unchecked, STOP and invoke the skill.**
+
+---
+
+**For complete SPX framework structure, templates, and procedures**: Invoke `/specs:managing-specs` skill.
+
+**For work item context loading and validation**: Invoke `/specs:understanding-specs` skill on the work item file.
