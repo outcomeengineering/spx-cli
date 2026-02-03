@@ -5,12 +5,8 @@
  *
  * @see story-32_fixture-writer.story.md
  */
-import { generateFixtureTree, PRESETS, type FixtureConfig } from "@test/harness/fixture-generator";
-import {
-  createFixture,
-  materializeFixture,
-  type MaterializedFixture,
-} from "@test/harness/fixture-writer";
+import { type FixtureConfig, generateFixtureTree, PRESETS } from "@test/harness/fixture-generator";
+import { createFixture, type MaterializedFixture, materializeFixture } from "@test/harness/fixture-writer";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -34,13 +30,13 @@ describe("materializeFixture", () => {
       expect(existsSync(fixture.path)).toBe(true);
     });
 
-    it("GIVEN tree WHEN materializing THEN creates specs/doing/ structure", async () => {
+    it("GIVEN tree WHEN materializing THEN creates specs/work/doing/ structure", async () => {
       const tree = generateFixtureTree(PRESETS.MINIMAL);
       const fixture = await materializeFixture(tree);
       fixtures.push(fixture);
 
       expect(existsSync(`${fixture.path}/specs`)).toBe(true);
-      expect(existsSync(`${fixture.path}/specs/doing`)).toBe(true);
+      expect(existsSync(`${fixture.path}/specs/work/doing`)).toBe(true);
     });
   });
 
@@ -50,7 +46,7 @@ describe("materializeFixture", () => {
       const fixture = await materializeFixture(tree);
       fixtures.push(fixture);
 
-      const doingPath = `${fixture.path}/specs/doing`;
+      const doingPath = `${fixture.path}/specs/work/doing`;
       const caps = readdirSync(doingPath).filter((d) => d.startsWith("capability-"));
       expect(caps.length).toBe(1);
 
@@ -64,7 +60,7 @@ describe("materializeFixture", () => {
       const fixture = await materializeFixture(tree);
       fixtures.push(fixture);
 
-      const doingPath = `${fixture.path}/specs/doing`;
+      const doingPath = `${fixture.path}/specs/work/doing`;
       const caps = readdirSync(doingPath).filter((d) => d.startsWith("capability-"));
       const capDir = `${doingPath}/${caps[0]}`;
 
@@ -317,13 +313,13 @@ describe("createFixture", () => {
 // Helper functions
 
 function findFirstCapabilityDir(fixturePath: string): string {
-  const doingPath = `${fixturePath}/specs/doing`;
+  const doingPath = `${fixturePath}/specs/work/doing`;
   const caps = readdirSync(doingPath).filter((d) => d.startsWith("capability-"));
   return `${doingPath}/${caps[0]}`;
 }
 
 function findFirstStoryDir(fixturePath: string): string | null {
-  const doingPath = `${fixturePath}/specs/doing`;
+  const doingPath = `${fixturePath}/specs/work/doing`;
   const caps = readdirSync(doingPath).filter((d) => d.startsWith("capability-"));
 
   for (const cap of caps) {
@@ -345,7 +341,7 @@ function findFirstStoryDir(fixturePath: string): string | null {
 
 function findAllStoryDirs(fixturePath: string): string[] {
   const storyDirs: string[] = [];
-  const doingPath = `${fixturePath}/specs/doing`;
+  const doingPath = `${fixturePath}/specs/work/doing`;
   const caps = readdirSync(doingPath).filter((d) => d.startsWith("capability-"));
 
   for (const cap of caps) {

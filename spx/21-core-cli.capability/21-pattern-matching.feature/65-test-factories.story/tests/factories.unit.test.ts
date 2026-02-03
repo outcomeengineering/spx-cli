@@ -75,7 +75,7 @@ describe("createWorkItem", () => {
       kind: WORK_ITEM_KINDS[0],
       number: 20,
       slug: "core-cli",
-      path: "/test/specs/doing/capability-21_core-cli",
+      path: "/test/specs/work/doing/capability-21_core-cli",
     });
   });
 

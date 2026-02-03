@@ -30,7 +30,7 @@ describe("E2E: Output Formats", () => {
       const tree = generateFixtureTree(PRESETS.FAN_10_LEVEL_3);
       fixture = await materializeFixture(tree);
 
-      const { stdout, exitCode } = await execa("node", [CLI_PATH, "status"], {
+      const { stdout, exitCode } = await execa("node", [CLI_PATH, "spec", "status"], {
         cwd: fixture.path,
       });
 
@@ -46,7 +46,7 @@ describe("E2E: Output Formats", () => {
 
       const { stdout, exitCode } = await execa(
         "node",
-        [CLI_PATH, "status", "--json"],
+        [CLI_PATH, "spec", "status", "--json"],
         { cwd: fixture.path },
       );
 
@@ -67,7 +67,7 @@ describe("E2E: Output Formats", () => {
 
       const { stdout, exitCode } = await execa(
         "node",
-        [CLI_PATH, "status", "--format", "markdown"],
+        [CLI_PATH, "spec", "status", "--format", "markdown"],
         { cwd: fixture.path },
       );
 
@@ -82,7 +82,7 @@ describe("E2E: Output Formats", () => {
 
       const { stdout, exitCode } = await execa(
         "node",
-        [CLI_PATH, "status", "--format", "table"],
+        [CLI_PATH, "spec", "status", "--format", "table"],
         { cwd: fixture.path },
       );
 
@@ -100,7 +100,7 @@ describe("E2E: Output Formats", () => {
       // Get JSON result for baseline counts
       const { stdout: jsonOut } = await execa(
         "node",
-        [CLI_PATH, "status", "--json"],
+        [CLI_PATH, "spec", "status", "--json"],
         { cwd: fixture.path },
       );
       const jsonData = JSON.parse(jsonOut);
@@ -116,10 +116,10 @@ describe("E2E: Output Formats", () => {
       fixture = await materializeFixture(tree);
 
       const formats = [
-        ["status"],
-        ["status", "--json"],
-        ["status", "--format", "markdown"],
-        ["status", "--format", "table"],
+        ["spec", "status"],
+        ["spec", "status", "--json"],
+        ["spec", "status", "--format", "markdown"],
+        ["spec", "status", "--format", "table"],
       ];
 
       for (const args of formats) {
@@ -136,7 +136,7 @@ describe("E2E: Output Formats", () => {
       const tree = generateFixtureTree(PRESETS.MINIMAL);
       fixture = await materializeFixture(tree);
 
-      const { stdout } = await execa("node", [CLI_PATH, "status", "--json"], {
+      const { stdout } = await execa("node", [CLI_PATH, "spec", "status", "--json"], {
         cwd: fixture.path,
       });
 
@@ -154,7 +154,7 @@ describe("E2E: Output Formats", () => {
       const tree = generateFixtureTree(PRESETS.MINIMAL);
       fixture = await materializeFixture(tree);
 
-      const { stdout } = await execa("node", [CLI_PATH, "status", "--json"], {
+      const { stdout } = await execa("node", [CLI_PATH, "spec", "status", "--json"], {
         cwd: fixture.path,
       });
 
@@ -189,7 +189,7 @@ describe("E2E: Output Formats", () => {
       const tree = generateFixtureTree(config);
       fixture = await materializeFixture(tree);
 
-      const { stdout } = await execa("node", [CLI_PATH, "status"], {
+      const { stdout } = await execa("node", [CLI_PATH, "spec", "status"], {
         cwd: fixture.path,
       });
 

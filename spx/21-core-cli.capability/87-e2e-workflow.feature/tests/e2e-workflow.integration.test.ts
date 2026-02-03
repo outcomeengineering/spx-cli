@@ -7,14 +7,11 @@
  * Tests at Level 2+3: Real filesystem + CLI execution.
  */
 import { WORK_ITEM_STATUSES } from "@/types";
+import { CLI_PATH, CLI_TIMEOUTS_MS } from "@test/harness/constants";
 import { countNodes, type FixtureConfig, generateFixtureTree, PRESETS } from "@test/harness/fixture-generator";
 import { createFixture, type MaterializedFixture, materializeFixture } from "@test/harness/fixture-writer";
 import { execa } from "execa";
-import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-
-// Path to CLI binary (relative to project root)
-const CLI_PATH = resolve(process.cwd(), "bin/spx.js");
 
 describe("Feature 87: E2E Workflow Integration", () => {
   let fixture: MaterializedFixture | null = null;
@@ -39,7 +36,7 @@ describe("Feature 87: E2E Workflow Integration", () => {
       // Story 43: CLI verification
       const { stdout, exitCode } = await execa(
         "node",
-        [CLI_PATH, "status", "--json"],
+        [CLI_PATH, "spec", "status", "--json"],
         { cwd: fixture.path },
       );
 
@@ -57,7 +54,7 @@ describe("Feature 87: E2E Workflow Integration", () => {
 
         const { stdout, exitCode } = await execa(
           "node",
-          [CLI_PATH, "status", "--json"],
+          [CLI_PATH, "spec", "status", "--json"],
           { cwd: fixture.path },
         );
 
@@ -80,7 +77,7 @@ describe("Feature 87: E2E Workflow Integration", () => {
       // Story 43: CLI verification
       const { stdout, exitCode } = await execa(
         "node",
-        [CLI_PATH, "status", "--json"],
+        [CLI_PATH, "spec", "status", "--json"],
         { cwd: fixture.path },
       );
 
@@ -92,9 +89,6 @@ describe("Feature 87: E2E Workflow Integration", () => {
   });
 
   describe("Comprehensive E2E", () => {
-    // E2E threshold includes Node.js startup overhead (~50-150ms)
-    const E2E_THRESHOLD_MS = 300;
-
     it("GIVEN SHALLOW_50 WHEN full workflow THEN CLI completes within threshold", async () => {
       const tree = generateFixtureTree(PRESETS.SHALLOW_50);
       fixture = await materializeFixture(tree);
@@ -102,13 +96,13 @@ describe("Feature 87: E2E Workflow Integration", () => {
       const startTime = Date.now();
       const { exitCode } = await execa(
         "node",
-        [CLI_PATH, "status", "--json"],
+        [CLI_PATH, "spec", "status", "--json"],
         { cwd: fixture.path },
       );
       const elapsed = Date.now() - startTime;
 
       expect(exitCode).toBe(0);
-      expect(elapsed).toBeLessThan(E2E_THRESHOLD_MS);
+      expect(elapsed).toBeLessThan(CLI_TIMEOUTS_MS.E2E);
     });
 
     it("GIVEN seeded config WHEN regenerating THEN produces identical fixtures", async () => {
@@ -119,7 +113,7 @@ describe("Feature 87: E2E Workflow Integration", () => {
       fixture = await materializeFixture(tree1);
       const { stdout: out1 } = await execa(
         "node",
-        [CLI_PATH, "status", "--json"],
+        [CLI_PATH, "spec", "status", "--json"],
         { cwd: fixture.path },
       );
       const result1 = JSON.parse(out1);
@@ -130,7 +124,7 @@ describe("Feature 87: E2E Workflow Integration", () => {
       fixture = await materializeFixture(tree2);
       const { stdout: out2 } = await execa(
         "node",
-        [CLI_PATH, "status", "--json"],
+        [CLI_PATH, "spec", "status", "--json"],
         { cwd: fixture.path },
       );
       const result2 = JSON.parse(out2);
@@ -153,7 +147,7 @@ describe("Feature 87: E2E Workflow Integration", () => {
 
       const { stdout } = await execa(
         "node",
-        [CLI_PATH, "status", "--json"],
+        [CLI_PATH, "spec", "status", "--json"],
         { cwd: fixture.path },
       );
       const result = JSON.parse(stdout);
@@ -184,7 +178,7 @@ describe("Feature 87: E2E Workflow Integration", () => {
 
       const { stdout } = await execa(
         "node",
-        [CLI_PATH, "status", "--json"],
+        [CLI_PATH, "spec", "status", "--json"],
         { cwd: fixture.path },
       );
       const result = JSON.parse(stdout);

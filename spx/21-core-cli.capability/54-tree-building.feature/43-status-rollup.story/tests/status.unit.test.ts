@@ -22,9 +22,10 @@ function createWorkItemWithPath(
 describe("buildTree - Status Rollup", () => {
   describe("GIVEN all children DONE", () => {
     it("WHEN rolling up status THEN parent is DONE", async () => {
-      // Given - status map: all features are DONE
+      // Given - status map: parent DONE and all features are DONE
+      // Per rollup rules: DONE requires ownStatus DONE AND all children DONE
       const statusMap: Record<string, string> = {
-        "/specs/capability-21_test": WORK_ITEM_STATUSES[0], // Will be overridden by rollup
+        "/specs/capability-21_test": WORK_ITEM_STATUSES[2], // Parent must be DONE for rollup to DONE
         "/specs/capability-21_test/feature-32_feat1": WORK_ITEM_STATUSES[2],
         "/specs/capability-21_test/feature-43_feat2": WORK_ITEM_STATUSES[2],
       };
@@ -148,9 +149,10 @@ describe("buildTree - Status Rollup", () => {
 
   describe("GIVEN all children OPEN", () => {
     it("WHEN rolling up status THEN parent is OPEN", async () => {
-      // Given - all features are OPEN
+      // Given - parent OPEN and all features are OPEN
+      // Per rollup rules: OPEN requires ownStatus OPEN AND all children OPEN
       const statusMap: Record<string, string> = {
-        "/specs/capability-21_test": WORK_ITEM_STATUSES[1], // Will be overridden by rollup
+        "/specs/capability-21_test": WORK_ITEM_STATUSES[0], // Parent must be OPEN for rollup to OPEN
         "/specs/capability-21_test/feature-32_feat1": WORK_ITEM_STATUSES[0],
         "/specs/capability-21_test/feature-43_feat2": WORK_ITEM_STATUSES[0],
       };

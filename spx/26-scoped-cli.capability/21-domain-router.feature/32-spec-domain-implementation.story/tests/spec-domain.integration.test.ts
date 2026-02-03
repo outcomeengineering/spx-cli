@@ -1,25 +1,16 @@
+import { CLI_PATH, FIXTURES_ROOT } from "@test/harness/constants";
 import { execa } from "execa";
-import path from "path";
-import { fileURLToPath } from "url";
+import { join } from "path";
 import { describe, expect, it } from "vitest";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const CLI_PATH = path.join(__dirname, "../../../../../../bin/spx.js");
 
 describe("Spec Domain Integration", () => {
   describe("status command", () => {
     it("GIVEN fixture repo WHEN running spec status THEN outputs tree", async () => {
       // Given: Fixture repo with work items
-      const cwd = path.join(__dirname, "../../../../../../tests/fixtures/repos/simple");
+      const cwd = join(FIXTURES_ROOT, "repos/simple");
 
       // When: Running spec status command
-      const { stdout, exitCode } = await execa("node", [
-        CLI_PATH,
-        "spec",
-        "status",
-      ], {
+      const { stdout, exitCode } = await execa("node", [CLI_PATH, "spec", "status"], {
         cwd,
       });
 
@@ -30,15 +21,10 @@ describe("Spec Domain Integration", () => {
 
     it("GIVEN fixture repo WHEN running spec status --json THEN outputs valid JSON", async () => {
       // Given: Fixture repo
-      const cwd = path.join(__dirname, "../../../../../../tests/fixtures/repos/simple");
+      const cwd = join(FIXTURES_ROOT, "repos/simple");
 
       // When: Running spec status --json
-      const { stdout, exitCode } = await execa("node", [
-        CLI_PATH,
-        "spec",
-        "status",
-        "--json",
-      ], {
+      const { stdout, exitCode } = await execa("node", [CLI_PATH, "spec", "status", "--json"], {
         cwd,
       });
 
@@ -53,14 +39,10 @@ describe("Spec Domain Integration", () => {
 
     it("GIVEN empty repo WHEN running spec status THEN shows no work items", async () => {
       // Given: Empty repo (no specs directory)
-      const cwd = path.join(__dirname, "../../../../../../tests/fixtures/repos/empty");
+      const cwd = join(FIXTURES_ROOT, "repos/empty");
 
       // When: Running spec status
-      const { stdout, exitCode } = await execa("node", [
-        CLI_PATH,
-        "spec",
-        "status",
-      ], {
+      const { stdout, exitCode } = await execa("node", [CLI_PATH, "spec", "status"], {
         cwd,
       });
 
@@ -73,14 +55,10 @@ describe("Spec Domain Integration", () => {
   describe("next command", () => {
     it("GIVEN fixture repo WHEN running spec next THEN finds next work item", async () => {
       // Given: Fixture repo with incomplete work items
-      const cwd = path.join(__dirname, "../../../../../../tests/fixtures/repos/mixed");
+      const cwd = join(FIXTURES_ROOT, "repos/mixed");
 
       // When: Running spec next
-      const { stdout, exitCode } = await execa("node", [
-        CLI_PATH,
-        "spec",
-        "next",
-      ], {
+      const { stdout, exitCode } = await execa("node", [CLI_PATH, "spec", "next"], {
         cwd,
       });
 
@@ -93,11 +71,7 @@ describe("Spec Domain Integration", () => {
   describe("help text", () => {
     it("GIVEN spec domain WHEN requesting help THEN shows spec commands", async () => {
       // When: Requesting help for spec domain
-      const { stdout, exitCode } = await execa("node", [
-        CLI_PATH,
-        "spec",
-        "--help",
-      ]);
+      const { stdout, exitCode } = await execa("node", [CLI_PATH, "spec", "--help"]);
 
       // Then: Shows spec commands
       expect(exitCode).toBe(0);
@@ -111,7 +85,7 @@ describe("Spec Domain Integration", () => {
   describe("error handling", () => {
     it("GIVEN invalid format WHEN running spec status THEN shows error", async () => {
       // Given: Fixture repo
-      const cwd = path.join(__dirname, "../../../../../../tests/fixtures/repos/simple");
+      const cwd = join(FIXTURES_ROOT, "repos/simple");
 
       // When: Running with invalid format
       const { stderr, exitCode } = await execa(

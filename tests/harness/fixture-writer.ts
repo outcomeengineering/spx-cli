@@ -85,12 +85,25 @@ async function materializeCapability(doingPath: string, cap: FixtureNode): Promi
   const decisionsPath = join(capPath, "decisions");
   await mkdir(decisionsPath, { recursive: true });
 
+  const features = cap.children.filter((c) => c.kind === WORK_ITEM_KINDS[1]);
   for (const child of cap.children) {
     if (child.kind === "adr") {
       await materializeAdr(decisionsPath, child);
     } else if (child.kind === WORK_ITEM_KINDS[1]) {
       await materializeFeature(capPath, child);
     }
+  }
+
+  // If all features are DONE (all their stories are DONE), create tests/DONE.md for capability
+  const allFeaturesDone = features.length > 0
+    && features.every((f) => {
+      const stories = f.children.filter((c) => c.kind === WORK_ITEM_KINDS[2]);
+      return stories.length > 0 && stories.every((s) => s.status === WORK_ITEM_STATUSES[2]);
+    });
+  if (allFeaturesDone) {
+    const testsPath = join(capPath, "tests");
+    await mkdir(testsPath, { recursive: true });
+    await writeFile(join(testsPath, "DONE.md"), `# Done\n\nAll features completed.\n`);
   }
 }
 
@@ -126,8 +139,17 @@ async function materializeFeature(capPath: string, feat: FixtureNode): Promise<v
   );
 
   // Materialize stories
-  for (const story of feat.children.filter((c) => c.kind === WORK_ITEM_KINDS[2])) {
+  const stories = feat.children.filter((c) => c.kind === WORK_ITEM_KINDS[2]);
+  for (const story of stories) {
     await materializeStory(featPath, story);
+  }
+
+  // If all stories are DONE, create tests/DONE.md for feature (required for status rollup)
+  const allStoriesDone = stories.length > 0 && stories.every((s) => s.status === WORK_ITEM_STATUSES[2]);
+  if (allStoriesDone) {
+    const testsPath = join(featPath, "tests");
+    await mkdir(testsPath, { recursive: true });
+    await writeFile(join(testsPath, "DONE.md"), `# Done\n\nAll stories completed.\n`);
   }
 }
 
