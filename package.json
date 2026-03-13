@@ -1,7 +1,7 @@
 {
-  "name": "spx",
+  "name": "@outcomeeng/cli",
   "version": "0.1.0",
-  "description": "Fast, deterministic CLI tool and MCP server for spec workflow management",
+  "description": "Developer CLI for outcome-driven development: code validation, spec tree management, and session handoffs",
   "type": "module",
   "bin": {
     "spx": "./bin/spx.js"

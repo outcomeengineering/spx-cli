@@ -212,11 +212,12 @@ Commands output XML-style tags for easy parsing by automation tools:
 
 ## Project Overview
 
-**spx** is a fast, deterministic CLI tool for spec workflow management:
+**spx** is a developer CLI for outcome-driven development:
 
-- **Instant spec status analysis** - <100ms deterministic scans
-- **Work item scanning** - Discover and classify capabilities, features, stories
-- **Multiple output formats** - Text, JSON, Markdown, Table
+- **Code validation** — ESLint, TypeScript, circular dependency detection, unused code analysis
+- **Spec tree management** — deterministic <100ms scans, status tracking via `outcomes.yaml`, CODE framework
+- **Session management** — work handoffs between agent contexts with priority ordering
+- **Multiple output formats** — Text, JSON for CI and automation
 
 ## Technical Stack
 
@@ -227,19 +228,9 @@ Commands output XML-style tags for easy parsing by automation tools:
 
 ## Development
 
-```bash
-# Install dependencies
-pnpm install
+See the [Development section in README.md](README.md#development) for setup, build, and test commands.
 
-# Run tests
-pnpm test
-
-# Build
-pnpm run build
-
-# Run locally
-node bin/spx.js --help
-```
+Use `pnpm run` scripts (e.g. `pnpm run validate`, `pnpm test`) for development — they work without a global link. The `spx` command requires `pnpm link --global` after building.
 
 ## Architecture
 

@@ -1,37 +1,35 @@
 # spx
 
-Fast, deterministic CLI tool for spec workflow management.
+Developer CLI for outcome-driven development: code validation, spec tree management, and session handoffs.
 
-> **Note**: This tool will be published to a registry when it reaches a more mature state. For now, install directly from GitHub.
+> **Note**: This tool will be published as `@outcomeeng/cli` when it reaches a more mature state. For now, install directly from GitHub.
 
 ## What is spx?
 
-**spx** is a developer CLI that provides code validation and session management for spec-driven projects. It orchestrates linting, type checking, circular dependency detection, and manages work handoffs between agent contexts.
+**spx** is a developer CLI for outcome-driven projects. It provides:
 
-### Key Benefits
+- **Code validation** — ESLint, TypeScript type checking, circular dependency detection, and unused code analysis through a single command
+- **Spec tree management** — create, navigate, validate, and track specifications following the CODE framework with outcome-based verification
+- **Session management** — queue, claim, and hand off work between agents with priority ordering
 
-- **Unified validation**: Run ESLint, TypeScript, and circular dependency checks through a single command
-- **Session management**: Queue, claim, and hand off work between agents
-- **Multiple formats**: Text, JSON output for CI and automation
+All commands are domain-scoped (e.g., `spx validation`, `spx session`, `spx spec`) and support `--quiet` and `--json` flags for CI and automation.
 
 ## Installation
 
 ### From GitHub (Latest)
 
 ```bash
-# Clone and install
 git clone https://github.com/simonheimlicher/spx-cli.git
 cd spx-cli
 pnpm install
 pnpm run build
-pnpm link --global  # Makes 'spx' available globally
+pnpm link --global  # Makes 'spx' available in your shell
 ```
 
 ### From Registry (Coming Soon)
 
 ```bash
-# Will be available when published
-pnpm add -g spx
+pnpm add -g @outcomeeng/cli
 ```
 
 ## Usage
@@ -53,7 +51,7 @@ spx validation knip           # Unused code detection
 spx validation all --scope production
 ```
 
-All commands support `--quiet` for CI and `--json` for machine-readable output.
+All validation commands support `--quiet` for CI and `--json` for machine-readable output.
 
 ### Session Management
 
@@ -98,22 +96,40 @@ See [Session Recipes](docs/how-to/session/common-tasks.md) for detailed usage pa
 
 ## Development
 
+### Setup
+
 ```bash
-# Install dependencies
+git clone https://github.com/simonheimlicher/spx-cli.git
+cd spx-cli
 pnpm install
-
-# Run tests
-pnpm test
-
-# Run validation (required before commits)
-pnpm run validate   # or: spx validation all
-
-# Build
 pnpm run build
-
-# Run locally
-node bin/spx.js --help
+pnpm link --global  # Optional: makes 'spx' available in your shell
 ```
+
+### Build and Test
+
+```bash
+pnpm run build          # Build with tsup
+pnpm run dev            # Build in watch mode
+pnpm test               # Run all tests
+pnpm run test:watch     # Run tests in watch mode
+pnpm run test:unit      # Unit tests only
+pnpm run test:e2e       # End-to-end tests only
+pnpm run test:coverage  # Tests with coverage
+```
+
+### Validation (Required Before Commits)
+
+```bash
+pnpm run validate       # Full pipeline: circular deps → ESLint → TypeScript
+pnpm run lint           # ESLint only
+pnpm run lint:fix       # ESLint with auto-fix
+pnpm run typecheck      # TypeScript only
+pnpm run circular       # Circular dependency detection
+pnpm run knip           # Unused code detection
+```
+
+The `pnpm run` scripts use `node bin/spx.js` internally, so they work without a global link. Once linked, you can also use `spx validation all` etc. directly.
 
 ## Technical Stack
 
